@@ -53,86 +53,39 @@ Real-time network monitoring for your home. See every connected device, track ba
 
 ---
 
-## Setup
+## Quick Start (Linux / macOS)
+
+One-time setup + single command to run.
 
 ### Prerequisites
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| Python | 3.11+ | Agent runtime |
-| Node.js | 22+ | Frontend build |
-| npm | 10+ | Package manager |
-| nmap _(optional)_ | Latest | Faster device scanning |
+| Dependency | Version |
+|------------|---------|
+| Python | 3.11+ |
+| Node.js | 22+ |
+| npm | 10+ |
 
-### macOS
-
-```bash
-# 1. Clone the repo
-git clone https://github.com/yourusername/netpulse
-cd netpulse
-
-# 2. Set up the Python agent
-cd agent
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-
-# 3. Start the agent
-python -m agent.run
-
-# 4. In another terminal — start the frontend
-cd ..
-npm install
-npx ng serve
-```
-
-Open `http://localhost:4200` in your browser.
-
-### Windows
-
-```powershell
-# 1. Clone the repo
-git clone https://github.com/yourusername/netpulse
-cd netpulse
-
-# 2. Set up the Python agent
-cd agent
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-
-# 3. Start the agent
-python -m agent.run
-
-# 4. In another terminal — start the frontend
-cd ..
-npm install
-npx ng serve
-```
-
-### Linux
+### Install (one time)
 
 ```bash
-# 1. Clone the repo
 git clone https://github.com/yourusername/netpulse
 cd netpulse
-
-# 2. Set up the Python agent
-cd agent
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-
-# 3. Start the agent (sudo may be needed for network scanning)
-sudo .venv/bin/python -m agent.run
-
-# 4. In another terminal — start the frontend
-cd ..
-npm install
-npx ng serve
+./scripts/install.sh
 ```
 
-> **Note:** Network scanning requires root/admin privileges on most systems. Without them, the agent falls back to reading the ARP cache, which shows only devices that have recently communicated with your machine.
+This creates a Python venv, installs dependencies, and builds the Angular frontend.
+
+### Start
+
+```bash
+sudo ./start.sh
+```
+
+Open **http://localhost:8000** in your browser.
+
+The agent serves both the API and the frontend on one port. No need to run `ng serve`.
+
+> **sudo** is needed for network scanning (nmap, raw sockets). Without it, the agent falls back to reading the ARP cache, which shows only recently active devices.
 
 ---
 

@@ -1,9 +1,14 @@
 import asyncio
 import logging
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from starlette.exceptions import HTTPException
+from starlette.requests import Request
+from starlette.responses import FileResponse
 
 from .health import get_health
 from .scanner import scan_devices
@@ -16,6 +21,18 @@ logging.basicConfig(
     format='%(asctime)s  %(name)s  %(levelname)s  %(message)s',
 )
 log = logging.getLogger('netpulse')
+
+STATIC_DIR = Path(__file__).parent.parent / 'dist' / 'lantern' / 'browser'
+
+
+class SPAStaticFiles(StaticFiles):
+    async def get_response(self, path: str, scope):
+        try:
+            return await super().get_response(path, scope)
+        except HTTPException as e:
+            if e.status_code == 404:
+                return await super().get_response('index.html', scope)
+            raise
 
 
 _scan_interval: float = 30.0
@@ -130,17 +147,9 @@ async def live_websocket(ws: WebSocket):
 
 
 @app.get('/')
-def root():
-    return {
-        'service': 'NetPulse Agent',
-        'version': '1.0.0',
-        'endpoints': [
-            'GET  /health',
-            'GET  /devices',
-            'GET  /alerts',
-            'GET  /history/latency?minutes=30',
-            'GET  /settings',
-            'POST /settings',
-            'WS   /ws/live',
-        ],
-    }
+async def root():
+    return FileResponse(STATIC_DIR / 'index.html')
+
+
+if STATIC_DIR.is_dir():
+    app.mount('/', SPAStaticFiles(directory=str(STATIC_DIR), html=True), name='app')
