@@ -68,8 +68,8 @@ Build a home network monitor with a cross-platform Python agent (FastAPI) and an
 | Phase 3 (Commits 6–7) | ✅ Committed (included in Phase 1) |
 | Phase 4 (Commits 8–9) | ✅ Committed (included in Phase 1) |
 | Phase 5 (Commits 10–12) | ✅ Committed |
-| Phase 6 (Commits 13–14) | ❌ Not started |
-| Phase 7 (Commits 15–16) | ❌ Not started |
+| Phase 6 (Commits 13–14) | ✅ Committed |
+| Phase 7 (Commits 15–16) | ✅ Committed |
 | Phase 8 (Commits 17–18) | ❌ Not started |
 
 ---
