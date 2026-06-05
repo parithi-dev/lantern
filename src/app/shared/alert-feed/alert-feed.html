@@ -1,0 +1,25 @@
+<div class="alert-feed">
+  <div class="alert-header">
+    <span class="material-icons alert-header-icon">notifications</span>
+    <span class="alert-title">Live Alerts</span>
+    @if (alerts().length > 0) {
+      <span class="alert-count">{{ alerts().length }}</span>
+    }
+  </div>
+  <div class="alert-list">
+    @for (alert of sorted; track alert.timestamp) {
+      <div class="alert-item" [class]="alertClass(alert.type)">
+        <span class="material-icons alert-item-icon">{{ alertIcon(alert.type) }}</span>
+        <div class="alert-content">
+          <span class="alert-message">{{ alert.message }}</span>
+          <span class="alert-time">{{ formatTime(alert.timestamp) }}</span>
+        </div>
+      </div>
+    } @empty {
+      <div class="alert-empty">
+        <span class="material-icons">check_circle</span>
+        <span>No alerts — network is stable</span>
+      </div>
+    }
+  </div>
+</div>

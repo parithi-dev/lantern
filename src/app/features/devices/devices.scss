@@ -1,0 +1,173 @@
+.devices-page {
+  padding: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: 28px;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.03em;
+  margin: 0 0 4px;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.devices-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.device-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  transition: all var(--transition-normal);
+}
+
+.device-card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-elevated);
+}
+
+.device-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.device-indicator.status-online {
+  background: var(--accent-green);
+  box-shadow: 0 0 8px rgba(0, 230, 118, 0.5);
+}
+
+.device-indicator.status-offline {
+  background: var(--text-muted);
+}
+
+.device-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.device-hostname {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.device-ip {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.device-mac {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+.device-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.device-vendor {
+  font-size: 12px;
+  color: var(--accent-cyan);
+  background: var(--accent-cyan-dim);
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.device-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.device-status .material-icons {
+  font-size: 14px;
+}
+
+.device-status.status-online {
+  color: var(--accent-green);
+}
+
+.device-status.status-offline {
+  color: var(--text-muted);
+}
+
+.device-time {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.devices-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 64px 32px;
+  color: var(--text-muted);
+}
+
+.devices-empty .material-icons {
+  font-size: 48px;
+  opacity: 0.3;
+}
+
+.devices-empty p {
+  margin: 0;
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .devices-page {
+    padding: 24px 16px;
+  }
+
+  .device-card {
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+  }
+
+  .device-meta {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+
+  .device-time {
+    display: none;
+  }
+}

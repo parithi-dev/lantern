@@ -1,0 +1,38 @@
+<div class="devices-page">
+  <div class="page-header">
+    <h1 class="page-title">Connected Devices</h1>
+    <p class="page-subtitle">
+      {{ devices().length }} device{{ devices().length !== 1 ? 's' : '' }} on network
+    </p>
+  </div>
+
+  <div class="devices-grid">
+    @for (device of devices(); track device.mac || device.ip) {
+      <div class="device-card">
+        <div class="device-indicator" [class]="statusClass(device.status)"></div>
+        <div class="device-info">
+          <span class="device-hostname">{{ device.hostname || device.ip }}</span>
+          <span class="device-ip">{{ device.ip }}</span>
+          @if (device.mac && device.mac !== 'Unknown') {
+            <span class="device-mac">{{ device.mac }}</span>
+          }
+        </div>
+        <div class="device-meta">
+          @if (device.vendor && device.vendor !== 'Unknown') {
+            <span class="device-vendor">{{ device.vendor }}</span>
+          }
+          <span class="device-status" [class]="statusClass(device.status)">
+            <span class="material-icons">{{ statusIcon(device.status) }}</span>
+            {{ device.status }}
+          </span>
+        </div>
+        <div class="device-time">{{ formatTime(device.lastSeen) }}</div>
+      </div>
+    } @empty {
+      <div class="devices-empty">
+        <span class="material-icons">wifi_off</span>
+        <p>No devices found. Make sure the agent is running.</p>
+      </div>
+    }
+  </div>
+</div>

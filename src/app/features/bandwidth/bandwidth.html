@@ -1,0 +1,36 @@
+<div class="bandwidth-page">
+  <div class="page-header">
+    <h1 class="page-title">Bandwidth</h1>
+    <p class="page-subtitle">Real-time download and upload usage</p>
+  </div>
+
+  <div class="bandwidth-cards">
+    <div class="bandwidth-card">
+      <div class="bw-icon download">
+        <span class="material-icons">arrow_downward</span>
+      </div>
+      <div class="bw-info">
+        <span class="bw-label">Download</span>
+        <span class="bw-value"
+          >{{ (health()?.downloadMbps ?? 0).toFixed(2) }} <span class="bw-unit">Mbps</span></span
+        >
+      </div>
+    </div>
+    <div class="bandwidth-card">
+      <div class="bw-icon upload">
+        <span class="material-icons">arrow_upward</span>
+      </div>
+      <div class="bw-info">
+        <span class="bw-label">Upload</span>
+        <span class="bw-value"
+          >{{ (health()?.uploadMbps ?? 0).toFixed(2) }} <span class="bw-unit">Mbps</span></span
+        >
+      </div>
+    </div>
+  </div>
+
+  <div class="placeholder-section">
+    <span class="material-icons">timeline</span>
+    <p>Bandwidth history chart coming soon</p>
+  </div>
+</div>

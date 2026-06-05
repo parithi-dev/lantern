@@ -1,0 +1,18 @@
+<div class="stat-card" [class]="'color-' + color()">
+  <div class="stat-header">
+    @if (icon()) {
+      <span class="stat-icon material-icons">{{ icon() }}</span>
+    }
+    <span class="stat-label">{{ label() }}</span>
+  </div>
+  <div class="stat-body">
+    <span class="stat-value">{{ value() }}</span>
+    @if (unit()) {
+      <span class="stat-unit">{{ unit() }}</span>
+    }
+  </div>
+  @if (subtitle()) {
+    <div class="stat-subtitle">{{ subtitle() }}</div>
+  }
+  <div class="stat-glow"></div>
+</div>
