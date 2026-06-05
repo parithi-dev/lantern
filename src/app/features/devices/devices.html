@@ -15,7 +15,7 @@
 
     <div class="grid-wrapper">
       <ag-grid-angular
-        class="ag-theme-custom"
+        class="ag-theme-quartz ag-theme-custom"
         [rowData]="devices()"
         [columnDefs]="colDefs"
         [defaultColDef]="defaultColDef"
@@ -73,9 +73,11 @@
           </div>
           <div class="detail-row">
             <span class="detail-label">Last Seen</span>
-            <span class="detail-value mono">{{
-              selectedDevice() ? formatTime(selectedDevice()!.lastSeen) : '—'
-            }}</span>
+            <span class="detail-value mono">{{ formatTime(selectedDevice()?.lastSeen) }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">First Seen</span>
+            <span class="detail-value mono">{{ formatTime(selectedDevice()?.firstSeen) }}</span>
           </div>
         </div>
 

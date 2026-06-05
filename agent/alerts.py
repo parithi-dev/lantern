@@ -6,17 +6,35 @@ class AlertManager:
     def __init__(self, max_alerts: int = 100):
         self._alerts: deque = deque(maxlen=max_alerts)
         self._known_devices: set[str] = set()
+        self._device_first_seen: dict[str, float] = {}
         self._latency_history: deque = deque(maxlen=30)
         self._latency_threshold: float = 200.0
 
     def set_latency_threshold(self, ms: float) -> None:
         self._latency_threshold = ms
 
+    def get_first_seen(self, mac: str) -> float | None:
+        return self._device_first_seen.get(mac)
+
+    def enrich_devices(self, devices: list[dict]) -> list[dict]:
+        for d in devices:
+            mac = d.get('mac', '')
+            if mac and mac != 'Unknown':
+                first_seen = self._device_first_seen.get(mac)
+                if first_seen:
+                    d['firstSeen'] = first_seen
+                else:
+                    d['firstSeen'] = time.time()
+        return devices
+
     def check_new_devices(self, current_devices: list[dict]) -> list[dict]:
         alerts: list[dict] = []
+        now = time.time()
         current_macs = {d['mac'] for d in current_devices if d.get('mac') and d['mac'] != 'Unknown'}
 
         for mac in current_macs:
+            if mac not in self._device_first_seen:
+                self._device_first_seen[mac] = now
             if mac not in self._known_devices:
                 self._known_devices.add(mac)
                 device = next((d for d in current_devices if d['mac'] == mac), None)
@@ -24,7 +42,7 @@ class AlertManager:
                     alerts.append({
                         'type': 'device_joined',
                         'message': f"New device joined: {device.get('hostname') or device['ip']}",
-                        'timestamp': time.time(),
+                        'timestamp': now,
                         'deviceIp': device['ip'],
                         'deviceMac': mac,
                     })

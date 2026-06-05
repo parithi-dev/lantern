@@ -1,6 +1,8 @@
+import os
 import subprocess
 import re
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 from .utils import (
@@ -12,6 +14,31 @@ from .utils import (
     get_default_gateway,
     get_network_interfaces,
 )
+
+
+def _ping_host(ip: str) -> str | None:
+    try:
+        if IS_WINDOWS:
+            subprocess.run(
+                ['ping', '-n', '1', '-w', '1000', ip],
+                capture_output=True,
+                timeout=2,
+            )
+        else:
+            subprocess.run(
+                ['ping', '-c', '1', '-W', '1', ip],
+                capture_output=True,
+                timeout=2,
+            )
+        return ip
+    except Exception:
+        return None
+
+
+def _ping_sweep(subnet_prefix: str):
+    ips = [f'{subnet_prefix}.{i}' for i in range(1, 255)]
+    with ThreadPoolExecutor(max_workers=50) as pool:
+        list(pool.map(_ping_host, ips))
 
 
 def _arp_scan() -> list[dict]:
@@ -119,16 +146,20 @@ def _resolve_hostname(ip: str) -> str:
         return ''
 
 
-def scan_devices(use_nmap: bool = True) -> list[dict]:
-    if use_nmap:
+def scan_devices(use_nmap: bool = True, alert_manager: object | None = None) -> list[dict]:
+    local_ip = get_local_ip()
+    subnet_prefix = '.'.join(local_ip.split('.')[:3]) if local_ip else None
+
+    is_root = not IS_WINDOWS and os.geteuid() == 0
+
+    if use_nmap and is_root:
         try:
             import nmap
             nm = nmap.PortScanner()
-            local_ip = get_local_ip()
-            if not local_ip:
+            if not subnet_prefix:
                 return _arp_scan()
-            subnet = '.'.join(local_ip.split('.')[:3]) + '.0/24'
-            nm.scan(hosts=subnet, arguments='-sn --unprivileged')
+            subnet = subnet_prefix + '.0/24'
+            nm.scan(hosts=subnet, arguments='-sn')
             devices = []
             for host in nm.all_hosts():
                 mac = nm[host]['addresses'].get('mac', 'Unknown')
@@ -140,10 +171,16 @@ def scan_devices(use_nmap: bool = True) -> list[dict]:
                     'status': nm[host].state(),
                     'lastSeen': time.time(),
                 })
+            if alert_manager:
+                devices = alert_manager.enrich_devices(devices)
             return devices
-        except ImportError:
-            pass
-        except Exception:
+        except (ImportError, Exception):
             pass
 
-    return _arp_scan()
+    if subnet_prefix and IS_LINUX:
+        _ping_sweep(subnet_prefix)
+
+    devices = _arp_scan()
+    if alert_manager:
+        devices = alert_manager.enrich_devices(devices)
+    return devices

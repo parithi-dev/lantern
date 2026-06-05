@@ -41,7 +41,7 @@ export class Devices implements OnInit, OnDestroy {
       headerName: 'Hostname',
       flex: 2,
       cellRenderer: (params: ICellRendererParams) => {
-        return params.value || params.data.ip;
+        return params.value || params.data.ip || 'Unknown';
       },
     },
     { field: 'ip', headerName: 'IP Address', flex: 1, filter: 'agTextColumnFilter' },
@@ -51,7 +51,7 @@ export class Devices implements OnInit, OnDestroy {
       headerName: 'Vendor',
       flex: 1,
       cellRenderer: (params: ICellRendererParams) => {
-        if (!params.value || params.value === 'Unknown') return '';
+        if (!params.value || params.value === 'Unknown') return `<span class="text-muted">—</span>`;
         return `<span class="vendor-badge">${params.value}</span>`;
       },
     },
@@ -69,6 +69,15 @@ export class Devices implements OnInit, OnDestroy {
     {
       field: 'lastSeen',
       headerName: 'Last Seen',
+      width: 160,
+      valueFormatter: (params) => {
+        if (!params.value) return '—';
+        return new Date(params.value * 1000).toLocaleString();
+      },
+    },
+    {
+      field: 'firstSeen',
+      headerName: 'First Seen',
       width: 160,
       valueFormatter: (params) => {
         if (!params.value) return '—';
@@ -112,7 +121,8 @@ export class Devices implements OnInit, OnDestroy {
     }));
   }
 
-  formatTime(ts: number): string {
+  formatTime(ts: number | undefined | null): string {
+    if (!ts) return '—';
     return new Date(ts * 1000).toLocaleString();
   }
 }

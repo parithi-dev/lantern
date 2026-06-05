@@ -7,6 +7,7 @@ export interface Device {
   vendor: string;
   status: 'online' | 'offline';
   lastSeen: number;
+  firstSeen?: number;
 }
 
 export interface HealthData {

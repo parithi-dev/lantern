@@ -44,7 +44,7 @@ async def _background_loop():
     while True:
         try:
             health = await get_health()
-            devices = scan_devices()
+            devices = scan_devices(alert_manager=alert_manager)
             new_alerts = alert_manager.check_new_devices(devices)
             latency_alerts = alert_manager.check_latency_spike(health.get('pingRouter'))
             all_alerts = new_alerts + latency_alerts
@@ -98,7 +98,7 @@ async def health_endpoint():
 
 @app.get('/devices')
 def devices_endpoint():
-    return scan_devices()
+    return scan_devices(alert_manager=alert_manager)
 
 
 @app.get('/alerts')
