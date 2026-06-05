@@ -46,32 +46,56 @@ export class NetworkService {
   totalDevices = computed(() => this.devices().length);
   avgPing = computed(() => this.health()?.pingRouter ?? 0);
 
-  async fetchHealth(): Promise<HealthData> {
-    const res = await fetch('http://localhost:8000/health');
-    const data = await res.json();
-    this.health.set(data);
-    return data;
+  async fetchHealth(): Promise<HealthData | null> {
+    try {
+      const res = await fetch('http://localhost:8000/health');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      this.health.set(data);
+      return data;
+    } catch (e) {
+      console.error('fetchHealth failed:', e);
+      return null;
+    }
   }
 
   async fetchDevices(): Promise<Device[]> {
-    const res = await fetch('http://localhost:8000/devices');
-    const data = await res.json();
-    this.devices.set(data);
-    return data;
+    try {
+      const res = await fetch('http://localhost:8000/devices');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (Array.isArray(data)) this.devices.set(data);
+      return this.devices();
+    } catch (e) {
+      console.error('fetchDevices failed:', e);
+      return this.devices();
+    }
   }
 
   async fetchAlerts(): Promise<Alert[]> {
-    const res = await fetch('http://localhost:8000/alerts');
-    const data = await res.json();
-    this.alerts.set(data);
-    return data;
+    try {
+      const res = await fetch('http://localhost:8000/alerts');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (Array.isArray(data)) this.alerts.set(data);
+      return this.alerts();
+    } catch (e) {
+      console.error('fetchAlerts failed:', e);
+      return this.alerts();
+    }
   }
 
   async fetchLatencyHistory(minutes = 30): Promise<LatencyPoint[]> {
-    const res = await fetch(`http://localhost:8000/history/latency?minutes=${minutes}`);
-    const data = await res.json();
-    this.latencyHistory.set(data);
-    return data;
+    try {
+      const res = await fetch(`http://localhost:8000/history/latency?minutes=${minutes}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (Array.isArray(data)) this.latencyHistory.set(data);
+      return this.latencyHistory();
+    } catch (e) {
+      console.error('fetchLatencyHistory failed:', e);
+      return this.latencyHistory();
+    }
   }
 
   async fetchAll(): Promise<void> {

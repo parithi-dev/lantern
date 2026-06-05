@@ -27,9 +27,11 @@ export class WebSocketService {
     this.ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        if (data.devices) this.network.devices.set(data.devices);
+        if (Array.isArray(data.devices) && data.devices.length > 0) {
+          this.network.devices.set(data.devices);
+        }
         if (data.health) this.network.health.set(data.health);
-        if (data.alerts) this.network.alerts.set(data.alerts);
+        if (Array.isArray(data.alerts)) this.network.alerts.set(data.alerts);
       } catch {
         // ignore parse errors
       }
