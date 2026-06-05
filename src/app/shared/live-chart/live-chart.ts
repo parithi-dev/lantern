@@ -1,4 +1,4 @@
-import { Component, input, viewChild, ElementRef, AfterViewInit, signal } from '@angular/core';
+import { Component, input, viewChild, ElementRef, AfterViewInit, effect } from '@angular/core';
 import Highcharts from 'highcharts';
 
 @Component({
@@ -9,11 +9,12 @@ import Highcharts from 'highcharts';
     `
       :host {
         display: block;
+        height: 100%;
       }
       .chart-container {
         width: 100%;
         height: 100%;
-        min-height: 200px;
+        min-height: 180px;
       }
     `,
   ],
@@ -23,14 +24,26 @@ export class LiveChart implements AfterViewInit {
   yLabel = input<string>('');
   data = input<Array<{ timestamp: number; value: number | null }>>([]);
   color = input<string>('#00d4ff');
+  gradient = input<boolean>(true);
 
   private chartContainer = viewChild<ElementRef>('chartContainer');
   private chart: Highcharts.Chart | null = null;
-  private _ready = signal(false);
+
+  constructor() {
+    effect(() => {
+      const points = this.data();
+      if (this.chart && points.length) {
+        const series = this.chart.series[0];
+        const mapped = points
+          .filter((p) => p.value !== null)
+          .map((p) => [p.timestamp * 1000, p.value!]);
+        series.setData(mapped as Highcharts.PointOptionsObject[], true);
+      }
+    });
+  }
 
   ngAfterViewInit(): void {
     this.initChart();
-    this._ready.set(true);
   }
 
   private initChart(): void {
@@ -41,8 +54,8 @@ export class LiveChart implements AfterViewInit {
       chart: {
         type: 'areaspline',
         backgroundColor: 'transparent',
-        animation: true,
-        spacing: [8, 8, 8, 8],
+        animation: { duration: 300 },
+        spacing: [4, 4, 4, 4],
         style: { fontFamily: 'DM Sans, sans-serif' },
       },
       title: { text: undefined },
@@ -69,7 +82,11 @@ export class LiveChart implements AfterViewInit {
       yAxis: {
         title: { text: undefined },
         labels: {
-          style: { color: '#5a6478', fontSize: '11px', fontFamily: 'JetBrains Mono' },
+          style: {
+            color: '#5a6478',
+            fontSize: '11px',
+            fontFamily: 'JetBrains Mono',
+          },
         },
         gridLineColor: 'rgba(0, 212, 255, 0.04)',
         min: 0,

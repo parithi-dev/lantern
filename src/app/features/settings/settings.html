@@ -4,8 +4,122 @@
     <p class="page-subtitle">Configure your network monitor</p>
   </div>
 
-  <div class="placeholder-section">
-    <span class="material-icons">settings</span>
-    <p>Settings panel coming soon — scan interval, alert thresholds, device labeling</p>
+  <div class="settings-sections">
+    <div class="settings-card">
+      <div class="settings-card-header">
+        <span class="material-icons">speed</span>
+        <div>
+          <h2 class="settings-card-title">Scan Interval</h2>
+          <p class="settings-card-desc">How often the agent scans your network</p>
+        </div>
+      </div>
+      <div class="settings-card-body">
+        <div class="interval-options">
+          @for (opt of [15, 30, 60, 300]; track opt) {
+            <button
+              class="interval-btn"
+              [class.active]="scanInterval() === opt"
+              (click)="scanInterval.set(opt)"
+            >
+              @if (opt < 60) {
+                <span class="interval-value">{{ opt }}s</span>
+              } @else if (opt === 60) {
+                <span class="interval-value">1m</span>
+              } @else {
+                <span class="interval-value">5m</span>
+              }
+              <span class="interval-label">
+                @if (opt <= 30) {
+                  Real-time
+                } @else if (opt <= 60) {
+                  Balanced
+                } @else {
+                  Eco
+                }
+              </span>
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <div class="settings-card-header">
+        <span class="material-icons">warning</span>
+        <div>
+          <h2 class="settings-card-title">Latency Threshold</h2>
+          <p class="settings-card-desc">Alert when router ping exceeds this value</p>
+        </div>
+      </div>
+      <div class="settings-card-body">
+        <div class="threshold-control">
+          <input
+            type="range"
+            min="50"
+            max="500"
+            step="10"
+            [value]="latencyThreshold()"
+            (input)="latencyThreshold.set(+$any($event.target).value)"
+            class="threshold-slider"
+          />
+          <div class="threshold-value">
+            <span class="threshold-number">{{ latencyThreshold() }}</span>
+            <span class="threshold-unit">ms</span>
+          </div>
+        </div>
+        <div class="threshold-labels">
+          <span>50 ms</span>
+          <span>500 ms</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <div class="settings-card-header">
+        <span class="material-icons">devices</span>
+        <div>
+          <h2 class="settings-card-title">Known Devices</h2>
+          <p class="settings-card-desc">Label devices so you can identify them easily</p>
+        </div>
+      </div>
+      <div class="settings-card-body">
+        @if (labeledDevices.length > 0) {
+          <div class="device-labels">
+            @for (device of labeledDevices; track device.mac) {
+              <div class="label-row">
+                <span class="label-mac mono">{{ device.mac }}</span>
+                <span class="label-name">{{ getDeviceLabel(device.mac) }}</span>
+                <span class="label-ip mono">{{ device.ip }}</span>
+              </div>
+            }
+          </div>
+        }
+
+        @if (unlabeledDevices.length > 0) {
+          <div class="unlabeled-section">
+            <p class="unlabeled-title">Unlabeled Devices</p>
+            @for (device of unlabeledDevices; track device.mac) {
+              <div class="label-row unlabeled">
+                <span class="label-mac mono">{{ device.mac }}</span>
+                <span class="label-ip mono">{{ device.ip }}</span>
+              </div>
+            }
+          </div>
+        } @else {
+          <p class="no-devices">No devices detected. Make sure the agent is running.</p>
+        }
+      </div>
+    </div>
+
+    <div class="settings-footer">
+      <button class="save-btn" (click)="saveSettings()">
+        @if (saved()) {
+          <span class="material-icons">check</span>
+          Saved
+        } @else {
+          Save Changes
+        }
+      </button>
+    </div>
   </div>
 </div>

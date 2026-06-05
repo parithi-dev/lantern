@@ -1,38 +1,91 @@
-<div class="devices-page">
-  <div class="page-header">
-    <h1 class="page-title">Connected Devices</h1>
-    <p class="page-subtitle">
-      {{ devices().length }} device{{ devices().length !== 1 ? 's' : '' }} on network
-    </p>
+<div class="devices-page" [class.panel-open]="panelOpen()">
+  <div class="devices-main">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Connected Devices</h1>
+        <p class="page-subtitle">
+          {{ devices().length }} device{{ devices().length !== 1 ? 's' : '' }} on network
+        </p>
+      </div>
+      <button class="refresh-btn" (click)="network.fetchDevices()">
+        <span class="material-icons">refresh</span>
+        Refresh
+      </button>
+    </div>
+
+    <div class="grid-wrapper">
+      <ag-grid-angular
+        class="ag-theme-custom"
+        [rowData]="devices()"
+        [columnDefs]="colDefs"
+        [defaultColDef]="defaultColDef"
+        [pagination]="true"
+        [paginationPageSize]="20"
+        [rowHeight]="52"
+        [headerHeight]="40"
+        [animateRows]="true"
+        [suppressCellFocus]="true"
+        (gridReady)="onGridReady($event)"
+        (rowClicked)="onRowClicked($event.data)"
+      />
+    </div>
   </div>
 
-  <div class="devices-grid">
-    @for (device of devices(); track device.mac || device.ip) {
-      <div class="device-card">
-        <div class="device-indicator" [class]="statusClass(device.status)"></div>
-        <div class="device-info">
-          <span class="device-hostname">{{ device.hostname || device.ip }}</span>
-          <span class="device-ip">{{ device.ip }}</span>
-          @if (device.mac && device.mac !== 'Unknown') {
-            <span class="device-mac">{{ device.mac }}</span>
-          }
-        </div>
-        <div class="device-meta">
-          @if (device.vendor && device.vendor !== 'Unknown') {
-            <span class="device-vendor">{{ device.vendor }}</span>
-          }
-          <span class="device-status" [class]="statusClass(device.status)">
-            <span class="material-icons">{{ statusIcon(device.status) }}</span>
-            {{ device.status }}
-          </span>
-        </div>
-        <div class="device-time">{{ formatTime(device.lastSeen) }}</div>
+  @if (panelOpen()) {
+    <div class="detail-overlay" (click)="closePanel()"></div>
+    <div class="detail-panel">
+      <div class="panel-header">
+        <h2 class="panel-title">{{ selectedDevice()?.hostname || selectedDevice()?.ip }}</h2>
+        <button class="panel-close" (click)="closePanel()">
+          <span class="material-icons">close</span>
+        </button>
       </div>
-    } @empty {
-      <div class="devices-empty">
-        <span class="material-icons">wifi_off</span>
-        <p>No devices found. Make sure the agent is running.</p>
+
+      <div class="panel-body">
+        <div class="detail-section">
+          <div class="detail-row">
+            <span class="detail-label">IP Address</span>
+            <span class="detail-value mono">{{ selectedDevice()?.ip }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">MAC Address</span>
+            <span class="detail-value mono">{{ selectedDevice()?.mac }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Vendor</span>
+            <span class="detail-value">
+              @if (selectedDevice()?.vendor && selectedDevice()?.vendor !== 'Unknown') {
+                <span class="vendor-badge">{{ selectedDevice()?.vendor }}</span>
+              } @else {
+                <span class="text-muted">Unknown</span>
+              }
+            </span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Status</span>
+            <span class="detail-value">
+              <span
+                class="status-indicator"
+                [class]="selectedDevice()?.status === 'online' ? 'online' : 'offline'"
+              ></span>
+              {{ selectedDevice()?.status === 'online' ? 'Online' : 'Offline' }}
+            </span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Last Seen</span>
+            <span class="detail-value mono">{{
+              selectedDevice() ? formatTime(selectedDevice()!.lastSeen) : '—'
+            }}</span>
+          </div>
+        </div>
+
+        <div class="detail-chart">
+          <h3 class="chart-title">Network Latency</h3>
+          <div class="chart-container">
+            <app-live-chart [data]="detailLatencyData" />
+          </div>
+        </div>
       </div>
-    }
-  </div>
+    </div>
+  }
 </div>
