@@ -22,7 +22,7 @@ npm ci --silent
 echo "      Done."
 
 echo "[3/3] Building frontend..."
-npx ng build --silent
+npx ng build 2>&1 | tail -5
 echo "      Done."
 
 echo ""
