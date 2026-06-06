@@ -13,22 +13,55 @@
       </button>
     </div>
 
-    <div class="grid-wrapper">
-      <ag-grid-angular
-        class="ag-theme-quartz ag-theme-custom"
-        [rowData]="devices()"
-        [columnDefs]="colDefs"
-        [defaultColDef]="defaultColDef"
-        [pagination]="true"
-        [paginationPageSize]="20"
-        [rowHeight]="52"
-        [headerHeight]="40"
-        [animateRows]="true"
-        [suppressCellFocus]="true"
-        (gridReady)="onGridReady($event)"
-        (rowClicked)="onRowClicked($event.data)"
-      />
+    <div class="card-grid">
+      @for (device of sortedDevices(); track device.mac) {
+        <div class="device-card" (click)="onDeviceClick(device)">
+          <div class="card-top">
+            <span
+              class="status-dot"
+              [class.online]="device.status === 'online'"
+              [class.offline]="device.status !== 'online'"
+            ></span>
+            <span class="card-hostname">{{ device.hostname || device.ip }}</span>
+          </div>
+
+          <div class="card-badges">
+            @if (device.vendor && device.vendor !== 'Unknown') {
+              <span class="vendor-badge">{{ device.vendor }}</span>
+            }
+            <span class="status-label" [class.online]="device.status === 'online'">
+              {{ device.status === 'online' ? 'Online' : 'Offline' }}
+            </span>
+          </div>
+
+          <div class="card-meta">
+            <div class="meta-row">
+              <span class="meta-label">IP</span>
+              <span class="meta-value mono">{{ device.ip }}</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">MAC</span>
+              <span class="meta-value mono">{{ device.mac }}</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">First seen</span>
+              <span class="meta-value">{{ formatTime(device.firstSeen) }}</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">Last seen</span>
+              <span class="meta-value">{{ formatTime(device.lastSeen) }}</span>
+            </div>
+          </div>
+        </div>
+      }
     </div>
+
+    @if (devices().length === 0) {
+      <div class="empty-state">
+        <span class="material-icons empty-icon">device_hub</span>
+        <p>No devices found. Run a network scan to discover connected devices.</p>
+      </div>
+    }
   </div>
 
   @if (panelOpen()) {
@@ -65,7 +98,7 @@
             <span class="detail-label">Status</span>
             <span class="detail-value">
               <span
-                class="status-indicator"
+                class="status-dot"
                 [class]="selectedDevice()?.status === 'online' ? 'online' : 'offline'"
               ></span>
               {{ selectedDevice()?.status === 'online' ? 'Online' : 'Offline' }}

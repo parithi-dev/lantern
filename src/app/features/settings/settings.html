@@ -15,7 +15,7 @@
       </div>
       <div class="settings-card-body">
         <div class="interval-options">
-          @for (opt of [15, 30, 60, 300]; track opt) {
+          @for (opt of [5, 10, 30, 60]; track opt) {
             <button
               class="interval-btn"
               [class.active]="scanInterval() === opt"
@@ -29,7 +29,7 @@
                 <span class="interval-value">5m</span>
               }
               <span class="interval-label">
-                @if (opt <= 30) {
+                @if (opt <= 10) {
                   Real-time
                 } @else if (opt <= 60) {
                   Balanced

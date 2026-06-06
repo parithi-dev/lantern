@@ -39,13 +39,15 @@ class AlertManager:
                 self._known_devices.add(mac)
                 device = next((d for d in current_devices if d['mac'] == mac), None)
                 if device:
-                    alerts.append({
+                    alert = {
                         'type': 'device_joined',
                         'message': f"New device joined: {device.get('hostname') or device['ip']}",
                         'timestamp': now,
                         'deviceIp': device['ip'],
                         'deviceMac': mac,
-                    })
+                    }
+                    self._alerts.append(alert)
+                    alerts.append(alert)
 
         return alerts
 
@@ -59,14 +61,16 @@ class AlertManager:
         if ping_router > self._latency_threshold:
             avg = sum(self._latency_history) / len(self._latency_history) if self._latency_history else 0
             if avg > 0 and ping_router > avg * 2:
-                alerts.append({
+                alert = {
                     'type': 'latency_spike',
                     'message': f"Latency spike: {ping_router}ms (avg: {avg:.0f}ms)",
                     'timestamp': time.time(),
                     'deviceIp': '',
                     'value': ping_router,
                     'threshold': self._latency_threshold,
-                })
+                }
+                self._alerts.append(alert)
+                alerts.append(alert)
 
         return alerts
 

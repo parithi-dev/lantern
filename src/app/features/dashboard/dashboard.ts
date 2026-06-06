@@ -25,12 +25,19 @@ export class Dashboard implements OnInit, OnDestroy {
   wsConnected = this.ws.connected;
 
   private pollingTimer: ReturnType<typeof setInterval> | null = null;
-  private interval = 10000;
+  private initialLoad = true;
 
   ngOnInit(): void {
     this.network.fetchAll();
     this.ws.connect();
-    this.pollingTimer = setInterval(() => this.network.fetchAll(), this.interval);
+
+    this.pollingTimer = setInterval(() => {
+      if (!this.ws.connected()) {
+        this.network.fetchAll();
+      }
+    }, 30000);
+
+    setInterval(() => this.network.fetchLatencyHistory(5), 30000);
   }
 
   ngOnDestroy(): void {

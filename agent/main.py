@@ -35,7 +35,7 @@ class SPAStaticFiles(StaticFiles):
             raise
 
 
-_scan_interval: float = 30.0
+_scan_interval: float = 5.0
 _background_task: asyncio.Task | None = None
 
 
@@ -116,7 +116,7 @@ def latency_history(minutes: int = 30):
 def get_settings():
     from .database import get_setting
     return {
-        'scanInterval': float(get_setting('scan_interval', '30')),
+        'scanInterval': float(get_setting('scan_interval', '5')),
         'latencyThreshold': float(get_setting('latency_threshold', '200')),
     }
 

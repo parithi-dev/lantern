@@ -18,7 +18,7 @@ export class Settings implements OnInit {
   private network = inject(NetworkService);
   devices = this.network.devices;
 
-  scanInterval = signal(30);
+  scanInterval = signal(5);
   latencyThreshold = signal(200);
   saved = signal(false);
 

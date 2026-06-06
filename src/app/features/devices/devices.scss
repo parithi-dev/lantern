@@ -67,63 +67,144 @@
   font-size: 16px;
 }
 
-.grid-wrapper {
+.card-grid {
   flex: 1;
-  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  align-content: start;
+  overflow-y: auto;
+  padding-bottom: 16px;
+}
+
+.device-card {
+  background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  overflow: hidden;
-  background: var(--bg-card);
-}
-
-.ag-theme-custom {
-  --ag-background-color: var(--bg-card);
-  --ag-odd-row-background-color: rgba(255, 255, 255, 0.01);
-  --ag-header-background-color: var(--bg-secondary);
-  --ag-border-color: var(--border-subtle);
-  --ag-row-hover-color: var(--bg-card-hover);
-  --ag-row-border-color: var(--border-subtle);
-  --ag-font-family: var(--font-sans);
-  --ag-font-size: 13px;
-  --ag-header-font-weight: 600;
-  --ag-header-font-size: 11px;
-  --ag-header-text-color: var(--text-muted);
-  --ag-text-color: var(--text-primary);
-  --ag-secondary-text-color: var(--text-secondary);
-  --ag-selected-row-background-color: rgba(0, 212, 255, 0.08);
-  --ag-range-selection-border-color: var(--accent-cyan);
-  --ag-borders: none;
-  --ag-borders-row: none;
-  --ag-row-height: 52px;
-  --ag-header-height: 40px;
-  --ag-cell-horizontal-padding: 16px;
-  --ag-cell-vertical-padding: 8px;
-}
-
-.ag-theme-custom .ag-header-row {
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.ag-theme-custom .ag-row {
-  border-bottom: 1px solid var(--border-subtle);
+  padding: 20px;
   cursor: pointer;
-  transition: background var(--transition-fast);
+  transition: all var(--transition-fast);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
-.ag-theme-custom .ag-row:last-child {
-  border-bottom: none;
+.device-card:hover {
+  border-color: var(--border-hover);
+  background: var(--bg-card-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
-.ag-theme-custom .ag-paging-panel {
-  border-top: 1px solid var(--border-subtle);
+.card-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-dot.online {
+  background: var(--accent-green);
+  box-shadow: 0 0 8px rgba(0, 200, 83, 0.5);
+}
+
+.status-dot.offline {
+  background: var(--text-muted);
+}
+
+.card-hostname {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.vendor-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(0, 212, 255, 0.1);
+  color: var(--accent-cyan);
+  letter-spacing: 0.02em;
+}
+
+.status-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.status-label.online {
+  color: var(--accent-green);
+}
+
+.status-label.offline {
   color: var(--text-muted);
-  font-family: var(--font-mono);
+}
+
+.card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 12px;
-  padding: 8px 16px;
 }
 
-.ag-theme-custom .ag-paging-panel span {
+.meta-label {
   color: var(--text-muted);
+  font-weight: 500;
+  min-width: 64px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 10px;
+}
+
+.meta-value {
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta-value.mono {
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--text-muted);
+}
+
+.empty-icon {
+  font-size: 48px;
+  opacity: 0.3;
 }
 
 .detail-overlay {
@@ -135,12 +216,8 @@
 }
 
 @keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .detail-panel {
@@ -159,12 +236,8 @@
 }
 
 @keyframes slide-in {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateX(0);
-  }
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
 }
 
 .panel-header {
@@ -277,6 +350,10 @@
 @media (max-width: 768px) {
   .devices-main {
     padding: 24px 16px;
+  }
+
+  .card-grid {
+    grid-template-columns: 1fr;
   }
 
   .detail-panel {

@@ -25,19 +25,36 @@ export class LiveChart implements AfterViewInit {
   data = input<Array<{ timestamp: number; value: number | null }>>([]);
   color = input<string>('#00d4ff');
   gradient = input<boolean>(true);
+  maxPoints = input(60);
 
   private chartContainer = viewChild<ElementRef>('chartContainer');
   private chart: Highcharts.Chart | null = null;
+  private seen = new Set<number>();
 
   constructor() {
     effect(() => {
       const points = this.data();
-      if (this.chart && points.length) {
-        const series = this.chart.series[0];
-        const mapped = points
-          .filter((p) => p.value !== null)
-          .map((p) => [p.timestamp * 1000, p.value!]);
-        series.setData(mapped as Highcharts.PointOptionsObject[], true);
+      if (!this.chart || !points.length) return;
+
+      const series = this.chart.series[0];
+      const max = this.maxPoints();
+
+      for (const p of points) {
+        if (p.value === null) continue;
+        if (this.seen.has(p.timestamp)) continue;
+        this.seen.add(p.timestamp);
+
+        const x = p.timestamp * 1000;
+        const y = p.value;
+
+        const count = series.data.length;
+        if (count >= max) {
+          const first = series.data[0];
+          if (first) {
+            this.seen.delete(Math.round(first.x / 1000));
+          }
+        }
+        series.addPoint([x, y] as any, true, count >= max, false);
       }
     });
   }
@@ -54,7 +71,7 @@ export class LiveChart implements AfterViewInit {
       chart: {
         type: 'areaspline',
         backgroundColor: 'transparent',
-        animation: { duration: 300 },
+        animation: { duration: 400 },
         spacing: [4, 4, 4, 4],
         style: { fontFamily: 'DM Sans, sans-serif' },
       },
@@ -90,6 +107,7 @@ export class LiveChart implements AfterViewInit {
         },
         gridLineColor: 'rgba(0, 212, 255, 0.04)',
         min: 0,
+        softMax: 100,
       },
       plotOptions: {
         areaspline: {

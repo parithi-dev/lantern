@@ -74,7 +74,14 @@ def get_latency_history(minutes: int = 30) -> list[dict]:
         (cutoff,),
     ).fetchall()
     conn.close()
-    return [dict(r) for r in rows]
+    return [
+        {
+            'timestamp': r['timestamp'],
+            'pingRouter': r['ping_router'],
+            'pingInternet': r['ping_internet'],
+        }
+        for r in rows
+    ]
 
 
 def save_devices(devices: list[dict]) -> None:
