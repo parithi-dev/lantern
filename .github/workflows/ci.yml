@@ -43,10 +43,7 @@ jobs:
           cache-dependency-path: agent/requirements.txt
 
       - run: pip install -r requirements.txt
-      - run: python -c "
-          from agent.main import app;
-          print(f'FastAPI app loaded: {app.title}')
-          "
+      - run: python -c "from agent.main import app; print('FastAPI app loaded: ' + app.title)"
 
   agent-win:
     name: Python Agent (Windows)
@@ -65,7 +62,7 @@ jobs:
           cache-dependency-path: agent/requirements.txt
 
       - run: pip install -r requirements.txt
-      - run: python -c "from agent.main import app; print(f'FastAPI app loaded: {app.title}')"
+      - run: python -c "from agent.main import app; print('FastAPI app loaded: ' + app.title)"
 
   lint:
     name: Format Check
