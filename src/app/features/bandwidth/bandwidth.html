@@ -18,54 +18,64 @@
     </div>
   </div>
 
-  <div class="chart-grid">
-    <div class="chart-card">
-      <div class="chart-card-header">
-        <div class="chart-card-title">
-          <span class="chart-dot download"></span>
-          Download
+  @if (loading()) {
+    <div class="chart-grid">
+      <div class="skel skel-chart" style="height: 300px"></div>
+      <div class="skel skel-chart" style="height: 300px"></div>
+    </div>
+    <div class="bandwidth-stats">
+      <div class="skel skel-text" style="height: 40px"></div>
+    </div>
+  } @else {
+    <div class="chart-grid">
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div class="chart-card-title">
+            <span class="chart-dot download"></span>
+            Download
+          </div>
+          <span class="chart-card-value">
+            {{ formatSpeed(health()?.downloadMbps ?? 0) }}
+            <span class="chart-card-unit">Mbps</span>
+          </span>
         </div>
-        <span class="chart-card-value">
-          {{ formatSpeed(health()?.downloadMbps ?? 0) }}
-          <span class="chart-card-unit">Mbps</span>
-        </span>
+        <div class="chart-card-body">
+          <app-live-chart [data]="downloadData()" color="#7c5cfc" />
+        </div>
       </div>
-      <div class="chart-card-body">
-        <app-live-chart [data]="downloadData()" color="#7c5cfc" />
+
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div class="chart-card-title">
+            <span class="chart-dot upload"></span>
+            Upload
+          </div>
+          <span class="chart-card-value">
+            {{ formatSpeed(health()?.uploadMbps ?? 0) }}
+            <span class="chart-card-unit">Mbps</span>
+          </span>
+        </div>
+        <div class="chart-card-body">
+          <app-live-chart [data]="uploadData()" color="#ffb300" />
+        </div>
       </div>
     </div>
 
-    <div class="chart-card">
-      <div class="chart-card-header">
-        <div class="chart-card-title">
-          <span class="chart-dot upload"></span>
-          Upload
-        </div>
-        <span class="chart-card-value">
-          {{ formatSpeed(health()?.uploadMbps ?? 0) }}
-          <span class="chart-card-unit">Mbps</span>
+    <div class="bandwidth-stats">
+      <div class="stat-row-item">
+        <span class="stat-row-label">Peak Download</span>
+        <span class="stat-row-value mono">
+          {{ formatSpeed(maxSpeed()) }} <span class="stat-row-unit">Mbps</span>
         </span>
       </div>
-      <div class="chart-card-body">
-        <app-live-chart [data]="uploadData()" color="#ffb300" />
+      <div class="stat-row-item">
+        <span class="stat-row-label">Data Points</span>
+        <span class="stat-row-value mono">{{ bandwidthHistory().length }}</span>
+      </div>
+      <div class="stat-row-item">
+        <span class="stat-row-label">Time Window</span>
+        <span class="stat-row-value mono">{{ bandwidthHistory().length * 5 }}s</span>
       </div>
     </div>
-  </div>
-
-  <div class="bandwidth-stats">
-    <div class="stat-row-item">
-      <span class="stat-row-label">Peak Download</span>
-      <span class="stat-row-value mono">
-        {{ formatSpeed(maxSpeed()) }} <span class="stat-row-unit">Mbps</span>
-      </span>
-    </div>
-    <div class="stat-row-item">
-      <span class="stat-row-label">Data Points</span>
-      <span class="stat-row-value mono">{{ bandwidthHistory().length }}</span>
-    </div>
-    <div class="stat-row-item">
-      <span class="stat-row-label">Time Window</span>
-      <span class="stat-row-value mono">{{ bandwidthHistory().length * 5 }}s</span>
-    </div>
-  </div>
+  }
 </div>

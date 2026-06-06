@@ -16,6 +16,7 @@ export class Devices implements OnInit, OnDestroy {
   protected network = inject(NetworkService);
   devices = this.network.devices;
   latencyHistory = this.network.latencyHistory;
+  loading = this.network.loading;
 
   selectedDevice = signal<Device | null>(null);
   panelOpen = computed(() => this.selectedDevice() !== null);

@@ -18,6 +18,7 @@ interface BandwidthPoint {
 export class Bandwidth implements OnInit {
   private network = inject(NetworkService);
   health = this.network.health;
+  loading = this.network.loading;
 
   bandwidthHistory = signal<BandwidthPoint[]>([]);
   private history: BandwidthPoint[] = [];

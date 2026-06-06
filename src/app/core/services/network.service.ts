@@ -41,6 +41,7 @@ export class NetworkService {
   health = signal<HealthData | null>(null);
   alerts = signal<Alert[]>([]);
   latencyHistory = signal<LatencyPoint[]>([]);
+  loading = signal(true);
 
   onlineCount = computed(() => this.devices().filter((d) => d.status === 'online').length);
   offlineCount = computed(() => this.devices().filter((d) => d.status === 'offline').length);
@@ -106,5 +107,6 @@ export class NetworkService {
       this.fetchAlerts(),
       this.fetchLatencyHistory(),
     ]);
+    this.loading.set(false);
   }
 }

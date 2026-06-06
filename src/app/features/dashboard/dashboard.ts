@@ -22,6 +22,7 @@ export class Dashboard implements OnInit, OnDestroy {
   onlineCount = this.network.onlineCount;
   totalDevices = this.network.totalDevices;
   latencyHistory = this.network.latencyHistory;
+  loading = this.network.loading;
   wsConnected = this.ws.connected;
 
   private fallbackTimer: ReturnType<typeof setInterval> | null = null;

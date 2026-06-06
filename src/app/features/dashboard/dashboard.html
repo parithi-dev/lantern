@@ -17,64 +17,76 @@
     </div>
   </div>
 
-  <div class="stats-grid">
-    <app-stat-card
-      label="Router"
-      [value]="health()?.routerIp || '…'"
-      icon="router"
-      color="cyan"
-      [subtitle]="'Local: ' + (health()?.localIp || '…')"
-    />
-    <app-stat-card
-      label="Download"
-      [value]="formatSpeed(health()?.downloadMbps ?? 0)"
-      [unit]="speedUnit(health()?.downloadMbps ?? 0)"
-      icon="download"
-      color="purple"
-    />
-    <app-stat-card
-      label="Upload"
-      [value]="formatSpeed(health()?.uploadMbps ?? 0)"
-      [unit]="speedUnit(health()?.uploadMbps ?? 0)"
-      icon="upload"
-      color="amber"
-    />
-    <app-stat-card
-      label="Router Ping"
-      [value]="pingValue(health()?.pingRouter ?? null)"
-      unit="ms"
-      icon="signal_cellular_alt"
-      [color]="pingStatus(health()?.pingRouter ?? null)"
-    />
-    <app-stat-card
-      label="Internet Ping"
-      [value]="pingValue(health()?.pingInternet ?? null)"
-      unit="ms"
-      icon="public"
-      [color]="pingStatus(health()?.pingInternet ?? null)"
-    />
-    <app-stat-card
-      label="Devices"
-      [value]="onlineCount() + '/' + totalDevices()"
-      unit="online"
-      icon="devices"
-      color="green"
-      [subtitle]="totalDevices() - onlineCount() + ' offline'"
-    />
-  </div>
+  @if (loading()) {
+    <div class="stats-grid">
+      @for (_ of [1,2,3,4,5,6]; track _) {
+        <div class="skel skel-card"></div>
+      }
+    </div>
+    <div class="dashboard-grid">
+      <div class="skel skel-chart"></div>
+      <div class="skel skel-chart" style="height: 300px"></div>
+    </div>
+  } @else {
+    <div class="stats-grid">
+      <app-stat-card
+        label="Router"
+        [value]="health()?.routerIp || '…'"
+        icon="router"
+        color="cyan"
+        [subtitle]="'Local: ' + (health()?.localIp || '…')"
+      />
+      <app-stat-card
+        label="Download"
+        [value]="formatSpeed(health()?.downloadMbps ?? 0)"
+        [unit]="speedUnit(health()?.downloadMbps ?? 0)"
+        icon="download"
+        color="purple"
+      />
+      <app-stat-card
+        label="Upload"
+        [value]="formatSpeed(health()?.uploadMbps ?? 0)"
+        [unit]="speedUnit(health()?.uploadMbps ?? 0)"
+        icon="upload"
+        color="amber"
+      />
+      <app-stat-card
+        label="Router Ping"
+        [value]="pingValue(health()?.pingRouter ?? null)"
+        unit="ms"
+        icon="signal_cellular_alt"
+        [color]="pingStatus(health()?.pingRouter ?? null)"
+      />
+      <app-stat-card
+        label="Internet Ping"
+        [value]="pingValue(health()?.pingInternet ?? null)"
+        unit="ms"
+        icon="public"
+        [color]="pingStatus(health()?.pingInternet ?? null)"
+      />
+      <app-stat-card
+        label="Devices"
+        [value]="onlineCount() + '/' + totalDevices()"
+        unit="online"
+        icon="devices"
+        color="green"
+        [subtitle]="totalDevices() - onlineCount() + ' offline'"
+      />
+    </div>
 
-  <div class="dashboard-grid">
-    <div class="chart-section">
-      <div class="section-header">
-        <h2 class="section-title">Latency</h2>
-        <span class="section-subtitle">Router ping over time</span>
+    <div class="dashboard-grid">
+      <div class="chart-section">
+        <div class="section-header">
+          <h2 class="section-title">Latency</h2>
+          <span class="section-subtitle">Router ping over time</span>
+        </div>
+        <div class="chart-wrapper">
+          <app-live-chart title="Router Latency" yLabel="ms" [data]="latencyChartData" />
+        </div>
       </div>
-      <div class="chart-wrapper">
-        <app-live-chart title="Router Latency" yLabel="ms" [data]="latencyChartData" />
+      <div class="alerts-section">
+        <app-alert-feed [alerts]="alerts()" />
       </div>
     </div>
-    <div class="alerts-section">
-      <app-alert-feed [alerts]="alerts()" />
-    </div>
-  </div>
+  }
 </div>
