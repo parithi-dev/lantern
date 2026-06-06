@@ -101,12 +101,16 @@ export class NetworkService {
   }
 
   async fetchAll(): Promise<void> {
+    const start = Date.now();
     await Promise.all([
       this.fetchHealth(),
       this.fetchDevices(),
       this.fetchAlerts(),
       this.fetchLatencyHistory(),
     ]);
+    const elapsed = Date.now() - start;
+    const remaining = Math.max(0, 600 - elapsed);
+    if (remaining > 0) await new Promise((r) => setTimeout(r, remaining));
     this.loading.set(false);
   }
 }
