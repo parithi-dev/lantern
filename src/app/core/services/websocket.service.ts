@@ -32,6 +32,7 @@ export class WebSocketService {
         }
         if (data.health) this.network.health.set(data.health);
         if (Array.isArray(data.alerts)) this.network.alerts.set(data.alerts);
+        if (Array.isArray(data.latencyHistory)) this.network.latencyHistory.set(data.latencyHistory);
       } catch {
         // ignore parse errors
       }

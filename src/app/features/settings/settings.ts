@@ -44,13 +44,13 @@ export class Settings implements OnInit {
 
   async saveSettings(): Promise<void> {
     try {
-      const params = new URLSearchParams();
-      params.set('scan_interval', String(this.scanInterval()));
-      params.set('latency_threshold', String(this.latencyThreshold()));
       await fetch('http://localhost:8000/settings', {
         method: 'POST',
-        body: params,
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          scan_interval: this.scanInterval(),
+          latency_threshold: this.latencyThreshold(),
+        }),
       });
       this.saved.set(true);
       setTimeout(() => this.saved.set(false), 2000);

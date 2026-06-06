@@ -24,25 +24,21 @@ export class Dashboard implements OnInit, OnDestroy {
   latencyHistory = this.network.latencyHistory;
   wsConnected = this.ws.connected;
 
-  private pollingTimer: ReturnType<typeof setInterval> | null = null;
-  private initialLoad = true;
+  private fallbackTimer: ReturnType<typeof setInterval> | null = null;
 
   ngOnInit(): void {
     this.network.fetchAll();
     this.ws.connect();
-
-    this.pollingTimer = setInterval(() => {
+    this.fallbackTimer = setInterval(() => {
       if (!this.ws.connected()) {
         this.network.fetchAll();
       }
     }, 30000);
-
-    setInterval(() => this.network.fetchLatencyHistory(5), 30000);
   }
 
   ngOnDestroy(): void {
     this.ws.disconnect();
-    if (this.pollingTimer) clearInterval(this.pollingTimer);
+    if (this.fallbackTimer) clearInterval(this.fallbackTimer);
   }
 
   get latencyChartData(): Array<{ timestamp: number; value: number | null }> {

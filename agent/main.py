@@ -7,13 +7,13 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException
-from starlette.requests import Request
+from starlette.requests import Request as StarletteRequest
 from starlette.responses import FileResponse
 
-from .health import get_health
+from .health import get_health, get_cached_health
 from .scanner import scan_devices
 from .alerts import alert_manager
-from .database import init_db, save_latency, save_devices, save_alert
+from .database import init_db, save_latency, save_devices, save_alert, get_latency_history
 from .connection_manager import manager
 
 logging.basicConfig(
@@ -58,6 +58,7 @@ async def _background_loop():
                 'devices': devices,
                 'health': health,
                 'alerts': alert_manager.get_alerts(limit=20),
+                'latencyHistory': get_latency_history(minutes=5),
             }
             await manager.broadcast(payload)
         except Exception as e:
@@ -93,6 +94,9 @@ app.add_middleware(
 
 @app.get('/health')
 async def health_endpoint():
+    cached = get_cached_health()
+    if cached:
+        return cached
     return await get_health(force_refresh=True)
 
 
@@ -122,9 +126,12 @@ def get_settings():
 
 
 @app.post('/settings')
-def update_settings(scan_interval: float | None = None, latency_threshold: float | None = None):
+async def update_settings(request: StarletteRequest):
     from .database import set_setting
     global _scan_interval
+    body = await request.json()
+    scan_interval = body.get('scan_interval')
+    latency_threshold = body.get('latency_threshold')
     if scan_interval is not None:
         set_setting('scan_interval', str(scan_interval))
         _scan_interval = scan_interval

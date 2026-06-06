@@ -101,3 +101,7 @@ async def get_health(force_refresh: bool = False) -> dict:
     _last_health = health_data
     _last_health_time = now
     return health_data
+
+
+def get_cached_health() -> dict | None:
+    return _last_health

@@ -31,7 +31,7 @@
         </span>
       </div>
       <div class="chart-card-body">
-        <app-live-chart [data]="downloadData" color="#7c5cfc" />
+        <app-live-chart [data]="downloadData()" color="#7c5cfc" />
       </div>
     </div>
 
@@ -47,7 +47,7 @@
         </span>
       </div>
       <div class="chart-card-body">
-        <app-live-chart [data]="uploadData" color="#ffb300" />
+        <app-live-chart [data]="uploadData()" color="#ffb300" />
       </div>
     </div>
   </div>
@@ -56,7 +56,7 @@
     <div class="stat-row-item">
       <span class="stat-row-label">Peak Download</span>
       <span class="stat-row-value mono">
-        {{ formatSpeed(maxSpeed) }} <span class="stat-row-unit">Mbps</span>
+        {{ formatSpeed(maxSpeed()) }} <span class="stat-row-unit">Mbps</span>
       </span>
     </div>
     <div class="stat-row-item">

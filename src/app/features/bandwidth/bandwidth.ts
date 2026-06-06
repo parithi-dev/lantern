@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, computed, effect } from '@angular/core';
 import { NetworkService } from '../../core/services/network.service';
 import { LiveChart } from '../../shared/live-chart/live-chart';
 
@@ -15,21 +15,40 @@ interface BandwidthPoint {
   templateUrl: './bandwidth.html',
   styleUrl: './bandwidth.scss',
 })
-export class Bandwidth implements OnInit, OnDestroy {
+export class Bandwidth implements OnInit {
   private network = inject(NetworkService);
   health = this.network.health;
 
   bandwidthHistory = signal<BandwidthPoint[]>([]);
   private history: BandwidthPoint[] = [];
   private maxPoints = 180;
+  private lastTimestamp = 0;
 
-  private polling: ReturnType<typeof setInterval> | null = null;
+  maxSpeed = computed(() => {
+    const h = this.bandwidthHistory();
+    if (!h.length) return 0;
+    return Math.max(...h.map((p) => p.downloadMbps));
+  });
 
-  ngOnInit(): void {
-    this.network.fetchHealth();
-    this.polling = setInterval(() => {
+  downloadData = computed(() =>
+    this.bandwidthHistory().map((p) => ({
+      timestamp: p.timestamp,
+      value: p.downloadMbps,
+    })),
+  );
+
+  uploadData = computed(() =>
+    this.bandwidthHistory().map((p) => ({
+      timestamp: p.timestamp,
+      value: p.uploadMbps,
+    })),
+  );
+
+  constructor() {
+    effect(() => {
       const h = this.health();
-      if (h) {
+      if (h && h.timestamp !== this.lastTimestamp) {
+        this.lastTimestamp = h.timestamp;
         this.history.push({
           timestamp: h.timestamp,
           downloadMbps: h.downloadMbps,
@@ -40,33 +59,11 @@ export class Bandwidth implements OnInit, OnDestroy {
         }
         this.bandwidthHistory.set([...this.history]);
       }
-      this.network.fetchHealth();
-    }, 5000);
+    });
   }
 
-  ngOnDestroy(): void {
-    if (this.polling) clearInterval(this.polling);
-  }
-
-  get downloadData(): Array<{ timestamp: number; value: number | null }> {
-    return this.bandwidthHistory().map((p) => ({
-      timestamp: p.timestamp,
-      value: p.downloadMbps,
-    }));
-  }
-
-  get uploadData(): Array<{ timestamp: number; value: number | null }> {
-    return this.bandwidthHistory().map((p) => ({
-      timestamp: p.timestamp,
-      value: p.uploadMbps,
-    }));
-  }
-
-  get maxSpeed(): number {
-    const all = this.bandwidthHistory();
-    if (!all.length) return 1;
-    const max = Math.max(...all.map((p) => Math.max(p.downloadMbps, p.uploadMbps)));
-    return Math.max(max * 1.2, 1);
+  ngOnInit(): void {
+    this.network.fetchHealth();
   }
 
   formatSpeed(mbps: number): string {
