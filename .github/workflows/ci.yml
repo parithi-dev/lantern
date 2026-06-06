@@ -1,5 +1,8 @@
 name: CI
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   push:
     branches: [main]
@@ -43,8 +46,8 @@ jobs:
           cache-dependency-path: agent/requirements.txt
 
       - run: pip install -r requirements.txt
-      - run: |
-          python -c "from agent.main import app; print('ok')"
+      - run: python -c "from agent.main import app; print('ok')"
+        working-directory: .
 
   agent-win:
     name: Python Agent (Windows)
@@ -63,8 +66,8 @@ jobs:
           cache-dependency-path: agent/requirements.txt
 
       - run: pip install -r requirements.txt
-      - run: |
-          python -c "from agent.main import app; print('FastAPI app loaded: ' + app.title)"
+      - run: python -c "from agent.main import app; print('ok')"
+        working-directory: .
 
   lint:
     name: Format Check

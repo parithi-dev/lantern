@@ -105,7 +105,9 @@
   color: var(--text-primary);
   line-height: 1.1;
   letter-spacing: -0.03em;
-  transition: opacity 0.3s ease, color 0.4s ease;
+  transition:
+    opacity 0.3s ease,
+    color 0.4s ease;
 }
 
 .color-cyan .stat-value {
