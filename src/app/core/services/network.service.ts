@@ -101,6 +101,7 @@ export class NetworkService {
   }
 
   async fetchAll(): Promise<void> {
+    this.loading.set(true);
     const start = Date.now();
     await Promise.all([
       this.fetchHealth(),

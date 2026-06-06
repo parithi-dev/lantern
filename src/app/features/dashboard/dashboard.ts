@@ -38,7 +38,6 @@ export class Dashboard implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.ws.disconnect();
     if (this.fallbackTimer) clearInterval(this.fallbackTimer);
   }
 
