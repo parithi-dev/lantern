@@ -11,7 +11,7 @@ from starlette.requests import Request as StarletteRequest
 from starlette.responses import FileResponse
 
 from .health import get_health, get_cached_health
-from .scanner import scan_devices
+from .scanner import scan_devices, get_cached_devices
 from .alerts import alert_manager
 from .database import init_db, save_latency, save_devices, save_alert, get_latency_history
 from .connection_manager import manager
@@ -102,7 +102,10 @@ async def health_endpoint():
 
 @app.get('/devices')
 def devices_endpoint():
-    return scan_devices(alert_manager=alert_manager)
+    cached = get_cached_devices()
+    if cached:
+        return cached
+    return scan_devices(alert_manager=alert_manager, fast=True)
 
 
 @app.get('/alerts')

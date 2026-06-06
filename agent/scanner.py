@@ -146,10 +146,19 @@ def _resolve_hostname(ip: str) -> str:
         return ''
 
 
-def scan_devices(use_nmap: bool = True, alert_manager: object | None = None) -> list[dict]:
+_last_devices: list[dict] | None = None
+_last_scan_time: float = 0
+
+
+def scan_devices(
+    use_nmap: bool = True,
+    alert_manager: object | None = None,
+    fast: bool = False,
+) -> list[dict]:
+    global _last_devices, _last_scan_time
+
     local_ip = get_local_ip()
     subnet_prefix = '.'.join(local_ip.split('.')[:3]) if local_ip else None
-
     is_root = not IS_WINDOWS and os.geteuid() == 0
 
     if use_nmap and is_root:
@@ -173,14 +182,30 @@ def scan_devices(use_nmap: bool = True, alert_manager: object | None = None) -> 
                 })
             if alert_manager:
                 devices = alert_manager.enrich_devices(devices)
+            _last_devices = devices
+            _last_scan_time = time.time()
             return devices
         except (ImportError, Exception):
             pass
 
-    if subnet_prefix and IS_LINUX:
+    if not fast and subnet_prefix and IS_LINUX:
         _ping_sweep(subnet_prefix)
 
     devices = _arp_scan()
     if alert_manager:
         devices = alert_manager.enrich_devices(devices)
+
+    if _last_devices and not fast:
+        existing = {d['mac'] for d in devices if d.get('mac') and d['mac'] != 'Unknown'}
+        for d in _last_devices:
+            mac = d.get('mac', '')
+            if mac and mac not in existing:
+                devices.append(d)
+
+    _last_devices = devices
+    _last_scan_time = time.time()
     return devices
+
+
+def get_cached_devices() -> list[dict] | None:
+    return _last_devices
